@@ -1,18 +1,11 @@
 <#
-cmd.exe /C powershell.exe "sl '%CD%';$Path=(gl).Path;sl ~;start powershell.exe -WindowStyle Maximized -Verb RunAs -Args \""-NoExit -ExecutionPolicy Unrestricted -Command sl '"$Path"';& .\Bootstrap.ps1 \"""
 
-Silence GitHub Desktop
-Test Pre-Existing Installs
-    Edge (from manual install)
-    Windows Terminal (from Microsoft Store)
-Test Idempotency
-Test Upgrades
-Create $global:Root
-Register Trusted Repositories
-Compare Versions from Chocolatey with Installs on DEATHSTAR
-Create $Profile Before Chocolatey
-Find Missing Az Module
-Obfuscate SA Password
+The "Target" in the Bootstrap.lnk shortcut file.
+
+    cmd.exe /C powershell.exe "sl '%CD%';$Path=(gl).Path;sl ~;start powershell.exe -WindowStyle Maximized -Verb RunAs -Args \""-NoExit -ExecutionPolicy Unrestricted -Command sl '"$Path"';& .\Bootstrap.ps1 \"""
+
+The "Start in" value of the Bootstrap.lnk shortcut must be blank.
+
 #>
 
 #Requires -RunAsAdministrator
@@ -31,14 +24,6 @@ Write-Host "Setting PowerShell Execution Policy..." -ForegroundColor Magenta
 
 Set-ExecutionPolicy Unrestricted -Scope CurrentUser -Force
 
-if (-not (Test-Path -Path "C:\VSTS")) {
-
-    Write-Host "Creating Source Control Root Folder..." -ForegroundColor Magenta
-
-    New-Item -Path "C:\VSTS" -ItemType Directory
-
-}
-
 if (-not (Test-Path -Path $profile)) {
 
     Write-Host "Creating Windows PowerShell Profile..." -ForegroundColor Magenta
@@ -55,7 +40,6 @@ Invoke-Expression ((New-Object System.Net.WebClient).DownloadString("https://cho
 
 Write-Host "Reloading Windows PowerShell Profile..." -ForegroundColor Magenta
 
-# https://stackoverflow.com/questions/46758437/how-to-refresh-the-environment-of-a-powershell-session-after-a-chocolatey-instal
 . $profile
 
 Write-Host "Enabling Chocolatey global confirmation..." -ForegroundColor Magenta
@@ -189,7 +173,7 @@ foreach ($Folder in @("C:\MSSQL\Backup", "C:\MSSQL\Data", "C:\MSSQL\JobLogs", "C
 
 Write-Host "Installing SQL Server 2019 Developer Edition..." -ForegroundColor Magenta
 
-#choco install -y sql-server-2019 --params="'/TCPENABLED=`"1`" /SECURITYMODE=`"SQL`" /SAPWD:`"${ENV:BV7_DB_PASS}`"'"
+# The SA password is intentionally hardcoded.
 choco install sql-server-2019 --params="'/IGNOREPENDINGREBOOT /SQLSVCSTARTUPTYPE=`"Automatic`" /AGTSVCSTARTUPTYPE=`"Automatic`" /INDICATEPROGRESS=`"True`" /USEMICROSOFTUPDATE=`"True`" /UPDATEENABLED=`"True`" /IACCEPTROPENLICENSETERMS=`"True`" /SUPPRESSPRIVACYSTATEMENTNOTICE=`"True`" /FEATURES=`"SQLENGINE,REPLICATION,CONN,IS,FULLTEXT`" /SQLUSERDBDIR=`"C:\MSSQL\Data`" /SQLUSERDBLOGDIR=`"C:\MSSQL\Logs`" /SQLBACKUPDIR=`"C:\MSSQL\Backup`" /SECURITYMODE=`"SQL`" /SAPWD=`"123!@#abc123!@#abc`"'"
 
 Write-Host "Installing SQL Server Management Studio..." -ForegroundColor Magenta
@@ -200,7 +184,6 @@ Update-SessionEnvironment
 
 Write-Host "Enabling IIS..." -ForegroundColor Magenta
 
-#Get-WindowsOptionalFeature -Online | Where-Object {$_.FeatureName -like "IIS*"} | Format-Table
 Enable-WindowsOptionalFeature -Online -FeatureName "IIS-WebServer" -All
 
 Write-Host "Bootstrap complete." -ForegroundColor Magenta
