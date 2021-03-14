@@ -15,7 +15,7 @@ Start-Transcript -Path "$HOME\Bootstrap.log"
 Write-Host "Checking Windows PowerShell Host..." -ForegroundColor Magenta
 
 if ($PSVersionTable.PSVersion.Major -ne 5) {
-    
+
     Write-Error "Requires Windows PowerShell" -ErrorAction Stop
 
 }
@@ -76,10 +76,10 @@ Install-PackageProvider -Name "NuGet" -MinimumVersion "2.8.5.201" -Force
 
 foreach ($Module in @("Az", "dbatools", "Oh-My-Posh", "Pester", "PSPKI", "Posh-Git")) {
 
-        Write-Host "Installing $Module PowerShell Module..." -ForegroundColor Magenta
+    Write-Host "Installing $Module PowerShell Module..." -ForegroundColor Magenta
 
-        Install-Module -Name $Module -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
-        
+    Install-Module -Name $Module -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
+
 }
 
 Write-Host "Installing Windows Terminal..." -ForegroundColor Magenta
@@ -154,7 +154,7 @@ if (Test-Path -Path $Config) {
 else {
 
     Write-Host "Could not find $Config.  Skipping Visual Studio 2019..." -ForegroundColor Magenta
-    
+
     Write-Host "Could not find $Config.  Skipping SQL Server Integration Services for Visual Studio 2019..." -ForegroundColor Magenta
 
 }
